@@ -1,25 +1,31 @@
-import http from 'node:http';
-import fs from 'node:fs/promises';
+import express from 'express';
 
-function getFilename(url) {
-  return url === '/' || url === '/index'
-    ? 'index.html'
-    : url === '/about'
-    ? 'about.html'
-    : url === '/contact-me'
-    ? 'contact-me.html'
-    : '404.html';
-}
+const app = express();
 
-http
-  .createServer(async (req, res) => {
-    const filename = getFilename(req.url);
-    try {
-      const file = await fs.readFile(filename);
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(file);
-    } catch (e) {
-      console.error(e);
-    }
-  })
-  .listen(8080);
+const options = { root: import.meta.dirname };
+
+app.get(['/', '/index'], (req, res) => {
+  res.sendFile('index.html', options, (e) => {
+    if (e) console.log(e);
+  });
+});
+
+app.get('/about', (req, res) => {
+  res.sendFile('about.html', options, (e) => {
+    if (e) console.log(e);
+  });
+});
+
+app.get('/contact-me', (req, res) => {
+  res.sendFile('contact-me.html', options, (e) => {
+    if (e) console.log(e);
+  });
+});
+
+app.get('*', (req, res) => {
+  res.sendFile('404.html', options, (e) => {
+    if (e) console.log(e);
+  });
+});
+
+app.listen(8080);
